@@ -192,7 +192,6 @@ const Dashboard = () => {
                   <div key={result._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium">{result.name}</p>
-                      <p className="text-sm text-gray-500">{result.email}</p>
                     </div>
                     <button
                       onClick={() => sendFriendRequest(result._id)}
@@ -254,7 +253,6 @@ const Dashboard = () => {
                         <div key={friend._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                           <div>
                             <p className="font-medium">{friend.name}</p>
-                            <p className="text-sm text-gray-500">{friend.email}</p>
                           </div>
                           <button
                             onClick={() => removeFriend(friend._id)}
@@ -277,7 +275,6 @@ const Dashboard = () => {
                         <div key={request._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                           <div>
                             <p className="font-medium">{request.name}</p>
-                            <p className="text-sm text-gray-500">{request.email}</p>
                           </div>
                           <div className="flex space-x-2">
                             <button
@@ -309,7 +306,6 @@ const Dashboard = () => {
                         <div key={recommendation._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                           <div>
                             <p className="font-medium">{recommendation.name}</p>
-                            <p className="text-sm text-gray-500">{recommendation.email}</p>
                           </div>
                           <button
                             onClick={() => sendFriendRequest(recommendation._id)}
