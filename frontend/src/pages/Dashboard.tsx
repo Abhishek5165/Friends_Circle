@@ -4,6 +4,9 @@ import { Search, UserPlus, UserMinus, LogOut, Bell} from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const API_URL=import.meta.env.MODE === "development" ? 
+"http://localhost:5000/api" : "/api";
+
 interface User {
   _id: string;
   name: string;
@@ -34,7 +37,7 @@ const Dashboard = () => {
   const fetchFriends = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/friends', {
+      const response = await axios.get(`${API_URL}/friends`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFriends(response.data);
@@ -46,7 +49,7 @@ const Dashboard = () => {
   const fetchFriendRequests = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/friends/requests', {
+      const response = await axios.get(`${API_URL}/friends/requests`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFriendRequests(response.data);
@@ -58,7 +61,7 @@ const Dashboard = () => {
   const fetchRecommendations = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/friends/recommendations', {
+      const response = await axios.get(`${API_URL}/friends/recommendations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRecommendations(response.data);
@@ -74,7 +77,7 @@ const Dashboard = () => {
     if (query.trim()) {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:5000/api/users/search?q=${query}`, {
+        const response = await axios.get(`${API_URL}/users/search?q=${query}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSearchResults(response.data);
@@ -89,7 +92,7 @@ const Dashboard = () => {
   const sendFriendRequest = async (userId: string) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/friends/request/${userId}`, {}, {
+      await axios.post(`${API_URL}/friends/request/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSearchResults(searchResults.filter(user => user._id !== userId));
@@ -102,7 +105,7 @@ const Dashboard = () => {
   const acceptFriendRequest = async (userId: string) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/friends/accept/${userId}`, {}, {
+      await axios.post(`${API_URL}/friends/accept/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Friend request accepted successfully!');
@@ -116,7 +119,7 @@ const Dashboard = () => {
   const rejectFriendRequest = async (userId: string) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`http://localhost:5000/api/friends/reject/${userId}`, {}, {
+      await axios.post(`${API_URL}/friends/reject/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Friend request rejected successfully!');
@@ -129,7 +132,7 @@ const Dashboard = () => {
   const removeFriend = async (userId: string) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/friends/${userId}`, {
+      await axios.delete(`${API_URL}/friends/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Friend removed successfully!');
