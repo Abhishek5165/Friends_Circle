@@ -1,5 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+
+const API_URL=import.meta.env.MODE === "development" ? 
+"http://localhost:5000/api/auth" : "/api/auth";
+
 interface AuthContextType {
   user: any;
   login: (email: string, password: string) => Promise<void>;
@@ -28,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (token) {
       // Verify token on page load
       axios
-        .get('http://localhost:5000/api/auth/verify', {
+        .get(`${API_URL}/verify`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -49,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${API_URL}/login`, {
         email,
         password,
       });
@@ -63,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
+      const response = await axios.post(`${API_URL}/signup`, {
         name,
         email,
         password,
