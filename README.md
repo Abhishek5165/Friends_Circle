@@ -46,6 +46,8 @@ frontend
 ```bash
 
 server
+├──cron
+    └── cron.js
 ├── middleware
 │   └── auth.js
 ├── models
@@ -95,16 +97,6 @@ FRIENDS CIRCLE
 
 ---
 
-## ✨ **Features**  
-
-- 🔒 **User Authentication and Authorization**  
-- 🤝 **Friend Request System**  
-- 🧑‍🤝‍🧑 **Friendship Management**  
-- 🔍 **User Search and Filtering**  
-- 📱 **Responsive Design**  
-
----
-
 ## ⚙️ **Installation**   
  
 
@@ -129,6 +121,16 @@ FRIENDS CIRCLE
    npm run dev
 
    ```  
+---
+
+## ✨ **Features**  
+
+- 🔒 **User Authentication and Authorization**  
+- 🤝 **Friend Request System**  
+- 🧑‍🤝‍🧑 **Friendship Management**  
+- 🔍 **User Search and Filtering**  
+- 📱 **Responsive Design**  
+
 ---
 
 ## 📡 **API Documentation**  
