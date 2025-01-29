@@ -3,21 +3,10 @@ import { useAuth } from '../context/AuthContext';
 import { Search, UserPlus, UserMinus, LogOut, Bell} from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { User, FriendRecommendation, FriendRequest } from '../types/user';
 
-const API_URL=import.meta.env.MODE === "development" ? 
+const API_URL = import.meta.env.MODE === "development" ? 
 "http://localhost:5000/api" : "/api";
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-}
-
-interface FriendRequest {
-  _id: string;
-  name: string;
-  email: string;
-}
 
 const Dashboard = () => {
   const { logout } = useAuth();
@@ -25,7 +14,7 @@ const Dashboard = () => {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [friends, setFriends] = useState<User[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [recommendations, setRecommendations] = useState<User[]>([]);
+  const [recommendations, setRecommendations] = useState<FriendRecommendation[]>([]);
   const [activeTab, setActiveTab] = useState('friends');
 
   useEffect(() => {
@@ -40,9 +29,11 @@ const Dashboard = () => {
       const response = await axios.get(`${API_URL}/friends`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setFriends(response.data);
+    
+      setFriends(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching friends:', error);
+      setFriends([]);
     }
   };
 
@@ -52,9 +43,10 @@ const Dashboard = () => {
       const response = await axios.get(`${API_URL}/friends/requests`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setFriendRequests(response.data);
+      setFriendRequests(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching friend requests:', error);
+      setFriendRequests([]);
     }
   };
 
@@ -64,9 +56,10 @@ const Dashboard = () => {
       const response = await axios.get(`${API_URL}/friends/recommendations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setRecommendations(response.data);
+      setRecommendations(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching recommendations:', error);
+      setRecommendations([]);
     }
   };
 
@@ -96,6 +89,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSearchResults(searchResults.filter(user => user._id !== userId));
+      await fetchRecommendations();
       toast.success('Friend request sent successfully!');
     } catch (error) {
       toast.error('Failed to send friend request.');
@@ -108,9 +102,10 @@ const Dashboard = () => {
       await axios.post(`${API_URL}/friends/accept/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Friend request accepted successfully!');
       await fetchFriendRequests();
       await fetchFriends();
+      await fetchRecommendations();
+      toast.success('Friend request accepted successfully!');
     } catch (error) {
       toast.error('Failed to accept friend request.');
     }
@@ -122,10 +117,10 @@ const Dashboard = () => {
       await axios.post(`${API_URL}/friends/reject/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Friend request rejected successfully!');
       await fetchFriendRequests();
+      toast.success('Friend request rejected successfully!');
     } catch (error) {
-      toast.error('Error rejecting friend request:');
+      toast.error('Error rejecting friend request.');
     }
   };
 
@@ -135,10 +130,11 @@ const Dashboard = () => {
       await axios.delete(`${API_URL}/friends/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Friend removed successfully!');
       await fetchFriends();
+      await fetchRecommendations();
+      toast.success('Friend removed successfully!');
     } catch (error) {
-    toast.error('Error removing friend:');
+      toast.error('Error removing friend.');
     }
   };
 
@@ -205,7 +201,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Main Content - Friends List */}
+          {/* Main Content */}
           <div className="md:col-span-2">
             <div className="bg-white rounded-lg shadow">
               <div className="border-b">
@@ -285,8 +281,7 @@ const Dashboard = () => {
                             </button>
                             <button
                               onClick={() => rejectFriendRequest(request._id)}
-                              className="px-4 py-2 bg-red-700 text-white
-                               rounded-lg hover:bg-red-600"
+                              className="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-600"
                             >
                               Reject
                             </button>
@@ -304,15 +299,36 @@ const Dashboard = () => {
                     ) : (
                       recommendations.map(recommendation => (
                         <div key={recommendation._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <p className="font-medium">{recommendation.name}</p>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <p className="font-medium">{recommendation.name}</p>
+                                <p className="text-sm text-gray-500">
+                                  {recommendation.mutualFriendsCount} mutual friend{recommendation.mutualFriendsCount !== 1 ? 's' : ''}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => sendFriendRequest(recommendation._id)}
+                                className="p-2 text-black-600 hover:bg-black-100 rounded-full"
+                              >
+                                <UserPlus size={20} />
+                              </button>
+                            </div>
+                            {recommendation.mutualFriends.length > 0 && (
+                              <div className="mt-2">
+                                <div className="flex flex-wrap gap-2">
+                                  {recommendation.mutualFriends.map(friend => (
+                                    <span
+                                      key={friend._id}
+                                      className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold, font-medium bg-green-300 text-gray-800"
+                                    >
+                                      {friend.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <button
-                            onClick={() => sendFriendRequest(recommendation._id)}
-                            className="p-2 text-black-600 hover:bg-black-100 rounded-full"
-                          >
-                            <UserPlus size={20} />
-                          </button>
                         </div>
                       ))
                     )}
